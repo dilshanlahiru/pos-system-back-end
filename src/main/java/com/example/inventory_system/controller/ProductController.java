@@ -1,6 +1,8 @@
-package com.example.inventory_system.products;
+package com.example.inventory_system.controller;
 
 
+import com.example.inventory_system.entity.Product;
+import com.example.inventory_system.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

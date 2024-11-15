@@ -1,10 +1,11 @@
-package com.example.inventory_system.products;
+package com.example.inventory_system.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "products")
 public class Product {
 
     @Id
