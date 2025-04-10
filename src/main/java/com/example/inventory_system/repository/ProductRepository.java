@@ -28,4 +28,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByCategory1AndCategory2AndCategory3AndCategory4(
             String category1, String category2, String category3, String category4
     );
+
+    Optional<Product> findByProductId(String productId);
 }

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -52,6 +51,11 @@ public class ProductService {
     }
 
     // --------- end of defult ones
+
+    public Product getProductByProductId(String productId) {
+        return productRepository.findByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with productId: " + productId));
+    }
 
     public List<Product> createProducts(List<Product> products) {
         return productRepository.saveAll(products);
