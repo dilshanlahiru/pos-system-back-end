@@ -20,11 +20,6 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-//    private final ProductService productService;
-
-//    public ProductController(ProductService productService) {
-//        this.productService = productService;
-//    }
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
@@ -53,6 +48,11 @@ public class ProductController {
     }
 
     // --------- end of defult ones
+
+    @GetMapping("/get-from-pid/{pId}")
+    public ResponseEntity<Product> getProductByProductID(@PathVariable String pId) {
+        return ResponseEntity.ok(productService.getProductByProductId(pId));
+    }
 
     @PostMapping("/bulk")
     public ResponseEntity<?> createProducts(@RequestBody List<Product> products) {

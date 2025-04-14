@@ -11,6 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stocks")
+@CrossOrigin(origins = "*")
 public class StockController {
     @Autowired
     private StockService stockService;
@@ -30,7 +31,7 @@ public class StockController {
     public ResponseEntity<?> createStock(@RequestBody Stock stock) {
         return stockService.createStock(stock);
 //        try {
-////            Stock created = stockService.createStock(stock);
+//            Stock created = stockService.createStock(stock);
 //            return ResponseEntity.status(201).body(created);
 //        } catch (Exception e) {
 //            return ResponseEntity.badRequest().body(Map.of(
@@ -74,5 +75,15 @@ public class StockController {
                     "message", e.getMessage()
             ));
         }
+    }
+
+    @GetMapping("/by-product/{productId}")
+    public ResponseEntity<?> getStockByProductId(@PathVariable String productId) {
+        return stockService.getStocksByProductId(productId);
+    }
+
+    @PutMapping("/safe-update")
+    public ResponseEntity<?> safeUpdateStock(@RequestBody Stock updatedStock) {
+        return stockService.updateStockSafely(updatedStock);
     }
 }

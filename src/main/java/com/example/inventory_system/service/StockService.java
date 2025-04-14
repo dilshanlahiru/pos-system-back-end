@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -91,4 +92,82 @@ public class StockService {
         }
         stockRepository.deleteById(id);
     }
+
+    public ResponseEntity<?> getStocksByProductId(String productId) {
+        List<Stock> stockList = stockRepository.findByProduct_ProductId(productId);
+
+        if (!stockList.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "type", "stockList",
+                    "data", stockList
+            ));
+        }
+
+        Optional<Product> productOpt = Optional.ofNullable(productService.getProductByProductId(productId));
+        if (productOpt.isPresent()) {
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "type", "productOnly",
+                    "data", productOpt.get()
+            ));
+        }
+
+        return ResponseEntity.status(404).body(Map.of(
+                "success", false,
+                "message", "No stock or product found for productId: " + productId
+        ));
+    }
+
+    public ResponseEntity<?> updateStockSafely(Stock updatedStock) {
+        // Check for essential identifiers
+        if (updatedStock.getId() == null ||
+                updatedStock.getProduct() == null ||
+                updatedStock.getProduct().getId() == null ||
+                updatedStock.getProduct().getProductId() == null ||
+                updatedStock.getProduct().getProductId().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Not enough identification data to update the stock. Must include: stock.id, product.id, product.productId"
+            ));
+        }
+
+        Optional<Stock> stockOpt = stockRepository.findById(updatedStock.getId());
+        if (stockOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of(
+                    "success", false,
+                    "message", "Stock not found for ID: " + updatedStock.getId()
+            ));
+        }
+
+        Stock existing = stockOpt.get();
+
+        if (updatedStock.getAvailableAmount() != null)
+            existing.setAvailableAmount(updatedStock.getAvailableAmount());
+        if (updatedStock.getReorderThreshold() != null)
+            existing.setReorderThreshold(updatedStock.getReorderThreshold());
+        if (updatedStock.getBarcode() != null && !updatedStock.getBarcode().trim().isEmpty())
+            existing.setBarcode(updatedStock.getBarcode());
+        existing.setLastUpdated(LocalDateTime.now());
+        if (updatedStock.getCost() != null)
+            existing.setCost(updatedStock.getCost());
+        if (updatedStock.getPricingRates() != null )
+            existing.setPricingRates(updatedStock.getPricingRates());
+        if (updatedStock.getDiscounts() != null )
+            existing.setDiscounts(updatedStock.getDiscounts());
+        if (updatedStock.getPrice() != null)
+            existing.setPrice(updatedStock.getPrice());
+        if (updatedStock.getUnit() != null && !updatedStock.getUnit().trim().isEmpty())
+            existing.setUnit(updatedStock.getUnit());
+        if (updatedStock.getSupplier() != null && !updatedStock.getSupplier().trim().isEmpty())
+            existing.setSupplier(updatedStock.getSupplier());
+
+        Stock saved = stockRepository.save(existing);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Stock updated successfully",
+                "data", saved
+        ));
+    }
+
 }
