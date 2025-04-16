@@ -1,5 +1,6 @@
 package com.example.inventory_system.service;
 
+import com.example.inventory_system.dto.CategorySearchRequest;
 import com.example.inventory_system.entity.Product;
 import com.example.inventory_system.entity.Stock;
 import com.example.inventory_system.repository.StockRepository;
@@ -116,6 +117,36 @@ public class StockService {
         return ResponseEntity.status(404).body(Map.of(
                 "success", false,
                 "message", "No stock or product found for productId: " + productId
+        ));
+    }
+
+    public ResponseEntity<?> getStocksByProductCategories(CategorySearchRequest request) {
+
+        Optional<Product> productOpt = Optional.ofNullable(productService.getProductByCategories(request.getCategory1(),
+                request.getCategory2(),
+                request.getCategory3(),
+                request.getCategory4()));
+
+        if (productOpt.isPresent()) {
+            List<Stock> stockList = stockRepository.findByProduct_ProductId(productOpt.get().getProductId());
+            if (!stockList.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "type", "stockList",
+                        "data", stockList
+                ));
+            }else {
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "type", "productOnly",
+                        "data", productOpt.get()
+                ));
+            }
+        }
+
+        return ResponseEntity.status(404).body(Map.of(
+                "success", false,
+                "message", "No stock or product found for entered categories"
         ));
     }
 

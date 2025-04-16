@@ -21,6 +21,7 @@ public class ProductService {
     }
 
     public Product createProduct(Product product) {
+        product.setProductId(generateNextProductId());
         return productRepository.save(product);
     }
 
@@ -74,5 +75,24 @@ public class ProductService {
         return productRepository
                 .findByCategory1AndCategory2AndCategory3AndCategory4(cat1, cat2, cat3, cat4)
                 .orElse(null);
+    }
+
+    private String generateNextProductId() {
+        String prefix = "PROD-";
+        String lastId = productRepository.findTopByOrderByIdDesc()
+                .map(Product::getProductId)
+                .orElse(null);
+
+        int nextNumber = 1;
+
+        if (lastId != null && lastId.startsWith(prefix)) {
+            try {
+                nextNumber = Integer.parseInt(lastId.substring(prefix.length())) + 1;
+            } catch (NumberFormatException e) {
+                // log a warning and keep nextNumber = 1
+            }
+        }
+
+        return prefix + String.format("%03d", nextNumber);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.inventory_system.controller;
 
+import com.example.inventory_system.dto.CategorySearchRequest;
 import com.example.inventory_system.entity.Stock;
 import com.example.inventory_system.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,11 @@ public class StockController {
     @GetMapping("/by-product/{productId}")
     public ResponseEntity<?> getStockByProductId(@PathVariable String productId) {
         return stockService.getStocksByProductId(productId);
+    }
+
+    @PostMapping("/by-product-categories")
+    public ResponseEntity<?> getStockByProductCategories(@RequestBody CategorySearchRequest request) {
+        return stockService.getStocksByProductCategories(request);
     }
 
     @PutMapping("/safe-update")
